@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The OASIS — Enter Another Dimension</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --void: #03020a;
+    --deep: #08061a;
+    --purple: #6c5ce7;
+    --purple-bright: #a29bfe;
+    --cyan: #00cec9;
+    --gold: #fdcb6e;
+    --white: #f0eeff;
+    --muted: #7b7a9a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--purple-bright);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform .1s, width .2s, height .2s, background .2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(162,155,254,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform .12s ease-out, width .3s, height .3s;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* Star field */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op, 0.1); }
+    50% { opacity: var(--max-op, 0.8); }
+  }
+
+  /* Grid overlay */
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(108,92,231,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,92,231,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    background: linear-gradient(to bottom, rgba(3,2,10,0.9), transparent);
+  }
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: .15em;
+    color: var(--purple-bright);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--cyan); }
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    color: var(--muted);
+    border: 1px solid rgba(108,92,231,0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp .8s ease forwards .3s;
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(52px, 10vw, 120px);
+    line-height: .95;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp .8s ease forwards .5s;
+  }
+  .hero-title .line1 { display: block; color: var(--white); }
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--purple-bright), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2.5vw, 22px);
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.7;
+    margin: 40px auto 64px;
+    opacity: 0;
+    animation: fadeUp .8s ease forwards .7s;
+  }
+  .hero-sub strong { color: var(--white); font-weight: 500; }
+
+  /* Orb */
+  .orb-wrap {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .orb {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%,
+      rgba(108,92,231,0.25) 0%,
+      rgba(0,206,201,0.08) 40%,
+      transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+  .orb::after {
+    content: '';
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    border: 1px solid rgba(108,92,231,0.2);
+    animation: spin 20s linear infinite;
+  }
+  .orb::before {
+    content: '';
+    position: absolute;
+    inset: 30%;
+    border-radius: 50%;
+    border: 1px solid rgba(0,206,201,0.15);
+    animation: spin 14s linear infinite reverse;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: .8; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* CTA form */
+  .cta-wrap {
+    opacity: 0;
+    animation: fadeUp .8s ease forwards .9s;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .cta-label {
+    font-size: 12px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, var(--purple), #4834d4);
+    color: #fff;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 18px 40px;
+    border-radius: 4px;
+    border: none;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 0 40px rgba(108,92,231,0.4);
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(108,92,231,0.6); }
+  .cta-btn:hover::before { opacity: 1; }
+  .cta-arrow { font-size: 18px; transition: transform .2s; }
+  .cta-btn:hover .cta-arrow { transform: translateX(4px); }
+
+  .cta-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp .8s ease forwards 1.4s;
+  }
+  .scroll-hint span { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: .3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 120px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .section-body {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 640px;
+  }
+  .section-body strong { color: var(--white); font-weight: 500; }
+
+  /* PILLARS */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 80px;
+    border: 1px solid rgba(108,92,231,0.15);
+  }
+  .pillar {
+    padding: 48px 40px;
+    border: 1px solid rgba(108,92,231,0.1);
+    background: rgba(8,6,26,0.6);
+    position: relative;
+    overflow: hidden;
+    transition: background .3s;
+  }
+  .pillar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--purple), var(--cyan));
+    transform: scaleX(0);
+    transition: transform .4s;
+    transform-origin: left;
+  }
+  .pillar:hover { background: rgba(108,92,231,0.08); }
+  .pillar:hover::before { transform: scaleX(1); }
+  .pillar-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--purple-bright);
+    letter-spacing: .2em;
+    margin-bottom: 20px;
+    opacity: .6;
+  }
+  .pillar-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--white);
+  }
+  .pillar-text {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* MANIFESTO */
+  .manifesto {
+    border-left: 2px solid var(--purple);
+    padding-left: 48px;
+    margin: 80px 0;
+  }
+  .manifesto-text {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--white);
+  }
+  .manifesto-text em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--purple-bright), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 80px;
+  }
+  .stat {
+    padding: 48px 32px;
+    border: 1px solid rgba(108,92,231,0.1);
+    background: rgba(8,6,26,0.6);
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--purple-bright), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .stat-label { font-size: 13px; color: var(--muted); letter-spacing: .1em; }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    padding: 160px 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .final-cta .orb-wrap {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 800px;
+    z-index: -1;
+  }
+  .final-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 6vw, 72px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .final-sub {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 56px;
+    font-weight: 300;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid rgba(108,92,231,0.1);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: .08em;
+  }
+  footer span { color: var(--purple-bright); }
+
+  /* DIVIDER LINE */
+  .h-line {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(108,92,231,0.3), transparent);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 640px) {
+    nav { padding: 20px 24px; }
+    .stats { grid-template-columns: 1fr; }
+    .orb-wrap { width: 300px; height: 300px; }
+    .pillars { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">THE <span>OASIS</span></a>
+  <div class="nav-badge">Early Access</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="orb-wrap"><div class="orb"></div></div>
+
+  <p class="hero-eyebrow">The future of human identity</p>
+
+  <h1 class="hero-title">
+    <span class="line1">Enter</span>
+    <span class="line2">The OASIS</span>
+  </h1>
+
+  <p class="hero-sub">
+    A digital universe where you can be <strong>anyone</strong>, go <strong>anywhere</strong>, and do <strong>anything</strong>.<br>
+    Your second life starts here.
+  </p>
+
+  <div class="cta-wrap">
+    <p class="cta-label">Join the waitlist — be first inside</p>
+    <a class="cta-btn" href="https://forms.gle/j5mJDSdmrukjPwNE7" target="_blank">
+      Claim your place <span class="cta-arrow">→</span>
+    </a>
+    <p class="cta-note">Free to join · No credit card · Be an early founder</p>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<div class="h-line"></div>
+
+<!-- WHAT IS IT -->
+<section class="reveal">
+  <p class="section-tag">What is the OASIS</p>
+  <h2 class="section-title">Not a game.<br>Not a social network.<br>A new dimension.</h2>
+  <p class="section-body">
+    The OASIS is a persistent virtual universe where your <strong>digital identity</strong> is yours forever.
+    Build your avatar. Define your personality. Let an AI companion grow with you.
+    Then step into infinite worlds — and become who you were always meant to be.
+  </p>
+</section>
+
+<!-- MANIFESTO -->
+<div class="h-line"></div>
+<section>
+  <div class="manifesto reveal">
+    <p class="manifesto-text">
+      The real world has limits.<br>
+      <em>The OASIS does not.</em><br>
+      Every world begins with a self.<br>
+      <em>Build yours.</em>
+    </p>
+  </div>
+</section>
+<div class="h-line"></div>
+
+<!-- PILLARS -->
+<section class="reveal">
+  <p class="section-tag">What we are building</p>
+  <h2 class="section-title">The Identity Layer</h2>
+  <p class="section-body">Phase one of the OASIS. The foundation everything else is built on.</p>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-num">01</div>
+      <div class="pillar-title">Avatar Creator</div>
+      <div class="pillar-text">Build your digital self from scratch. Body, face, voice, style. Human, fantasy, sci-fi, or something the world has never seen.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">02</div>
+      <div class="pillar-title">AI Companion</div>
+      <div class="pillar-text">Every avatar ships with an AI that has your personality and memory. It grows with you. It is not a chatbot — it is your other self.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">03</div>
+      <div class="pillar-title">Persistent Soul</div>
+      <div class="pillar-text">Your identity is permanent. It lives across every session, every world, every version of the OASIS. Your history. Your story.</div>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">04</div>
+      <div class="pillar-title">Your Passport</div>
+      <div class="pillar-text">A shareable profile card that is your OASIS identity. One link. Your whole digital self — ready to bring into any world.</div>
+    </div>
+  </div>
+</section>
+
+<div class="h-line"></div>
+
+<!-- STATS -->
+<section class="reveal">
+  <p class="section-tag">The scale of the vision</p>
+  <h2 class="section-title">Why now</h2>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">$700B</span>
+      <span class="stat-label">Projected metaverse market by 2030</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3.2B</span>
+      <span class="stat-label">People who play games globally today</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">1</span>
+      <span class="stat-label">Universal identity layer — and no one has built it yet</span>
+    </div>
+  </div>
+</section>
+
+<div class="h-line"></div>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+  <div class="orb-wrap"><div class="orb"></div></div>
+  <p class="section-tag reveal">Your dimension is waiting</p>
+  <h2 class="final-title reveal">Be one of the<br><span style="background:linear-gradient(135deg,#a29bfe,#00cec9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">first inside</span></h2>
+  <p class="final-sub reveal">Join the waitlist. Shape the OASIS from day one.</p>
+  <div class="reveal">
+    <a class="cta-btn" href="https://forms.gle/j5mJDSdmrukjPwNE7" target="_blank" style="font-size:15px;padding:22px 56px;">
+      Join the waitlist <span class="cta-arrow">→</span>
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>THE OASIS</span> · Building the next dimension · &copy; 2025
+</footer>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 180; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + .5;
+    s.style.cssText = `
+      width:${size}px;height:${size}px;
+      top:${Math.random()*100}%;left:${Math.random()*100}%;
+      --d:${2+Math.random()*4}s;
+      --delay:${Math.random()*4}s;
+      --min-op:${.05+Math.random()*.15};
+      --max-op:${.4+Math.random()*.6};
+    `;
+    starsEl.appendChild(s);
+  }
+
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * .12; ry += (my - ry) * .12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.width='20px'; cursor.style.height='20px'; cursor.style.background='var(--cyan)'; });
+    el.addEventListener('mouseleave', () => { cursor.style.width='12px'; cursor.style.height='12px'; cursor.style.background='var(--purple-bright)'; });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.15 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
