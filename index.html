@@ -295,14 +295,26 @@
   .floral{ position:absolute; z-index:2; pointer-events:none; user-select:none; }
   .fly{ position:fixed; z-index:50; pointer-events:none; font-size:34px; will-change:transform; }
 
-  /* ---------- VIDEOS ---------- */
-  #videos{
-    min-height:70vh; padding:110px 24px; text-align:center;
-    background:linear-gradient(180deg,#ffe9c7 0%,#1a0712 100%);
+  /* ---------- VIDEOS (one per page) ---------- */
+  .vid-page{
+    min-height:100vh; padding:90px 24px; text-align:center;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative;
   }
+  #video1{ background:linear-gradient(180deg,#ffe9c7 0%,#3a1226 100%); }
+  #video2{ background:linear-gradient(180deg,#3a1226 0%,#0a0510 100%); }
   .vid-title{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(30px,6vw,52px); color:#fff; }
-  .vid-note{ margin-top:18px; font-family:'Fredoka'; color:#f7c9d8; max-width:560px; line-height:1.7; }
+  .vid-note{ margin-top:14px; font-family:'Fredoka'; color:#f7c9d8; max-width:560px; line-height:1.7; }
+  .vid-player{
+    margin-top:34px; width:min(420px,86vw); max-height:74vh;
+    border-radius:22px; border:4px solid rgba(247,169,196,.45);
+    box-shadow:0 26px 70px rgba(0,0,0,.55); background:#000;
+    display:block;
+  }
+  .vid-eyebrow{
+    font-family:'Fredoka'; font-weight:600; letter-spacing:.3em; text-transform:uppercase;
+    font-size:12px; color:#f7a9c4; margin-bottom:14px;
+  }
   .vid-slot{
     margin-top:40px; width:min(640px,90vw); aspect-ratio:16/9;
     border:2px dashed rgba(247,169,196,.6); border-radius:20px;
@@ -460,13 +472,18 @@
   <div class="scroll-hint" style="position:relative;margin-top:60px;color:#a8324f"><span>one more thing</span><span class="arrow">↓</span></div>
 </section>
 
-<!-- ============ VIDEOS (placeholder for Mourad) ============ -->
-<section id="videos">
-  <h2 class="vid-title">and there's more coming, just for you…</h2>
-  <p class="vid-note">Mourad is going to add some videos right here. Stay tuned, Ghofran. 🎬</p>
-  <!-- 👇 MOURAD: drop your <video> tags here (or replace this slot). Example:
-       <video class="vid-player" controls src="my-video.mp4"></video> -->
-  <div class="vid-slot">🎬 your videos will live here soon</div>
+<!-- ============ VIDEO PAGE 1 ============ -->
+<section id="video1" class="vid-page">
+  <div class="vid-eyebrow">just for you · 01</div>
+  <h2 class="vid-title">and there's something I wanted you to see…</h2>
+  <video class="vid-player" controls playsinline preload="metadata" src="assets/video1.mp4"></video>
+</section>
+
+<!-- ============ VIDEO PAGE 2 ============ -->
+<section id="video2" class="vid-page">
+  <div class="vid-eyebrow">just for you · 02</div>
+  <h2 class="vid-title">…and one more, from me to you 🤍</h2>
+  <video class="vid-player" controls playsinline preload="metadata" src="assets/video2.mp4"></video>
 </section>
 
 <footer>made with way too much care, by <b>your grumpy MOURAD</b> · for <b>Ghofran</b> 🤍</footer>
